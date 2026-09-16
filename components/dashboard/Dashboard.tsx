@@ -1,17 +1,41 @@
 "use client";
 
-import { BreakdownChart, DailyExpenseChart } from "@/components/dashboard/Charts";
+import { BreakdownChart } from "@/components/dashboard/Charts";
 import { InstallmentsCard } from "@/components/dashboard/InstallmentsCard";
+import { RecentTransactions } from "@/components/dashboard/RecentTransactions";
 import { SummaryCards } from "@/components/dashboard/SummaryCards";
 import { TransactionsTable } from "@/components/dashboard/TransactionsTable";
 import { Filters, type FilterValues } from "@/components/filters/Filters";
-import { getAverageDailyExpense, getBalance, getDailyExpenses, getGroupedExpenses, getIncomeCommittedPercentage, getInstallments, getLargestExpenseCategory, getTotalExpenses, getTotalIncome } from "@/lib/finance";
+import { DashboardWithCollapsibleSidebar } from "@/components/ui/dashboard-with-collapsible-sidebar";
+import ProgressMetricCard from "@/components/ui/progress-metric-card";
+import {
+  getAverageDailyExpense,
+  getBalance,
+  getCumulativeDailyExpenses,
+  getDailyExpenses,
+  getGroupedExpenses,
+  getIncomeCommittedPercentage,
+  getInstallments,
+  getLargestExpenseCategory,
+  getTotalExpenses,
+  getTotalIncome,
+} from "@/lib/finance";
+import { formatCurrency, formatDate, formatMonthYear, formatPercentage } from "@/lib/formatters";
 import { filterTransactions } from "@/lib/transactions";
 import { isTransactionsApiResponse, type Transaction } from "@/types/transaction";
 import { useEffect, useMemo, useState } from "react";
 
-const initialFilters: FilterValues = { period: "thisMonth", type: "all", category: "all", account: "all", query: "", startDate: "", endDate: "" };
-export function Dashboard() {
+const initialFilters: FilterValues = {
+  period: "thisMonth",
+  type: "all",
+  category: "all",
+  account: "all",
+  query: "",
+  startDate: "",
+  endDate: "",
+};
+
+export function Dashboard({ userEmail }: { userEmail: string }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filters, setFilters] = useState<FilterValues>(initialFilters);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
@@ -22,19 +46,40 @@ export function Dashboard() {
     const controller = new AbortController();
     setStatus("loading");
     setError("");
+
     fetch("/api/transactions", { signal: controller.signal })
       .then(async (response) => {
         const data: unknown = await response.json();
-        if (!isTransactionsApiResponse(data) || !response.ok || !data.ok || !Array.isArray(data.transactions)) throw new Error(isTransactionsApiResponse(data) ? data.error || "Não foi possível carregar os dados." : "Não foi possível carregar os dados.");
+        if (!isTransactionsApiResponse(data) || !response.ok || !data.ok || !Array.isArray(data.transactions)) {
+          throw new Error(
+            isTransactionsApiResponse(data)
+              ? data.error || "Não foi possível carregar os dados."
+              : "Não foi possível carregar os dados.",
+          );
+        }
+
         setTransactions(data.transactions);
         setStatus("ready");
       })
-      .catch((reason: unknown) => { if (!(reason instanceof DOMException && reason.name === "AbortError")) { setError(reason instanceof Error ? reason.message : "Erro inesperado."); setStatus("error"); } });
+      .catch((reason: unknown) => {
+        if (!(reason instanceof DOMException && reason.name === "AbortError")) {
+          setError(reason instanceof Error ? reason.message : "Erro inesperado.");
+          setStatus("error");
+        }
+      });
+
     return () => controller.abort();
   }, [requestVersion]);
 
-  const categories = useMemo(() => [...new Set(transactions.map((item) => item.category))].sort(), [transactions]);
-  const accounts = useMemo(() => [...new Set(transactions.map((item) => item.account))].sort(), [transactions]);
+  const categories = useMemo(
+    () => [...new Set(transactions.map((item) => item.category))].sort((a, b) => a.localeCompare(b, "pt-BR")),
+    [transactions],
+  );
+  const accounts = useMemo(
+    () => [...new Set(transactions.map((item) => item.account))].sort((a, b) => a.localeCompare(b, "pt-BR")),
+    [transactions],
+  );
+  const periodLabel = useMemo(() => getPeriodLabel(filters), [filters]);
   const dashboardData = useMemo(() => {
     if (status !== "ready") return null;
 
@@ -48,6 +93,7 @@ export function Dashboard() {
       incomeCommitted: getIncomeCommittedPercentage(filtered),
       largest: getLargestExpenseCategory(filtered),
       dailyExpenses: getDailyExpenses(filtered),
+      cumulativeDailyExpenses: getCumulativeDailyExpenses(filtered),
       categoryData: getGroupedExpenses(filtered, "category"),
       accountData: getGroupedExpenses(filtered, "account"),
       paymentData: getGroupedExpenses(filtered, "paymentMethod"),
@@ -55,16 +101,164 @@ export function Dashboard() {
     };
   }, [filters, status, transactions]);
 
-  return <main className="min-h-screen bg-canvas px-4 py-7 sm:px-8"><div className="mx-auto max-w-7xl space-y-5"><header className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-sm font-semibold uppercase tracking-[0.18em] text-pine">Controle compartilhado</p><h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Finanças</h1></div><p className="text-sm text-stone-500">Visão clara das movimentações do casal</p></header>
-    {status === "loading" && <LoadingState />}
-    {status === "error" && <ErrorState error={error} onRetry={() => setRequestVersion((version) => version + 1)} />}
-    {status === "ready" && dashboardData && <><Filters values={filters} categories={categories} accounts={accounts} onChange={setFilters} />
-      {dashboardData.filtered.length === 0 ? <EmptyState /> : <><SummaryCards income={dashboardData.income} expenses={dashboardData.expenses} balance={dashboardData.balance} average={dashboardData.average} incomeCommitted={dashboardData.incomeCommitted} largest={dashboardData.largest} />
-      <div className="grid gap-5 lg:grid-cols-2"><DailyExpenseChart data={dashboardData.dailyExpenses} /><BreakdownChart title="Gastos por categoria" data={dashboardData.categoryData} /><BreakdownChart title="Gastos por conta" data={dashboardData.accountData} /><BreakdownChart title="Gastos por forma de pagamento" data={dashboardData.paymentData} /><InstallmentsCard transactions={dashboardData.installments} /></div>
-      <TransactionsTable transactions={dashboardData.filtered} /></>}</>}
-  </div></main>;
+  const resetFilters = () => setFilters(initialFilters);
+
+  return (
+    <DashboardWithCollapsibleSidebar
+      periodLabel={periodLabel}
+      transactionCount={dashboardData?.filtered.length}
+      userEmail={userEmail}
+    >
+      <div className="space-y-6">
+        {status === "loading" && <LoadingState />}
+        {status === "error" && (
+          <ErrorState error={error} onRetry={() => setRequestVersion((version) => version + 1)} />
+        )}
+        {status === "ready" && dashboardData && (
+          <>
+            <Filters
+              values={filters}
+              categories={categories}
+              accounts={accounts}
+              resultCount={dashboardData.filtered.length}
+              onChange={setFilters}
+              onReset={resetFilters}
+            />
+
+            {dashboardData.filtered.length === 0 ? (
+              <EmptyState hasTransactions={transactions.length > 0} onReset={resetFilters} />
+            ) : (
+              <>
+                <SummaryCards
+                  income={dashboardData.income}
+                  expenses={dashboardData.expenses}
+                  balance={dashboardData.balance}
+                  average={dashboardData.average}
+                  incomeCommitted={dashboardData.incomeCommitted}
+                  largest={dashboardData.largest}
+                />
+
+                <div id="analises" className="grid scroll-mt-24 gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(20rem,0.85fr)]">
+                  <ProgressMetricCard
+                    key={periodLabel}
+                    title="Gasto acumulado"
+                    total={formatCurrency(dashboardData.expenses)}
+                    delta={formatCurrency(dashboardData.dailyExpenses.at(-1)?.value ?? 0)}
+                    deltaLabel="no último dia com gastos"
+                    percent={
+                      dashboardData.income > 0
+                        ? `${formatPercentage(dashboardData.incomeCommitted)} da renda`
+                        : "Sem receitas"
+                    }
+                    trend="up"
+                    accent="red"
+                    data={dashboardData.cumulativeDailyExpenses}
+                    period={periodLabel}
+                    periodOptions={[
+                      { label: "7 dias com gastos", points: 7 },
+                      { label: "14 dias com gastos", points: 14 },
+                      { label: periodLabel },
+                    ]}
+                    valueFormatter={formatCurrency}
+                    dateFormatter={formatDate}
+                  />
+                  <RecentTransactions transactions={dashboardData.filtered} />
+                </div>
+
+                <div className="grid gap-5 lg:grid-cols-2">
+                  <BreakdownChart title="Gastos por categoria" data={dashboardData.categoryData} />
+                  <BreakdownChart title="Gastos por conta" data={dashboardData.accountData} />
+                  <BreakdownChart title="Gastos por pagamento" data={dashboardData.paymentData} />
+                  <InstallmentsCard transactions={dashboardData.installments} />
+                </div>
+
+                <TransactionsTable transactions={dashboardData.filtered} />
+              </>
+            )}
+          </>
+        )}
+      </div>
+    </DashboardWithCollapsibleSidebar>
+  );
 }
 
-function LoadingState() { return <div role="status" className="grid gap-4 sm:grid-cols-3"><p className="sr-only">Carregando movimentações</p>{Array.from({ length: 6 }, (_, index) => <div key={index} className="h-32 animate-pulse rounded-2xl bg-stone-200" />)}</div>; }
-function EmptyState() { return <section className="rounded-2xl border border-dashed border-stone-300 bg-white p-12 text-center"><h2 className="text-lg font-semibold">Nenhuma movimentação encontrada</h2><p className="mt-2 text-sm text-stone-500">Ajuste os filtros ou registre uma movimentação pelo Shortcut.</p></section>; }
-function ErrorState({ error, onRetry }: { error: string; onRetry: () => void }) { return <section role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-950"><h2 className="font-semibold">Não foi possível carregar o dashboard</h2><p className="mt-1 text-sm">{error}</p><button className="mt-4 rounded-lg bg-red-800 px-3 py-2 text-sm font-semibold text-white" onClick={onRetry}>Tentar novamente</button></section>; }
+function LoadingState() {
+  return (
+    <div role="status" aria-live="polite" className="space-y-5">
+      <p className="sr-only">Carregando movimentações</p>
+      <div className="dashboard-card h-28 animate-pulse bg-stone-100/80" />
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        {Array.from({ length: 6 }, (_, index) => (
+          <div key={index} className="dashboard-card h-40 animate-pulse bg-stone-100/80" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function EmptyState({ hasTransactions, onReset }: { hasTransactions: boolean; onReset: () => void }) {
+  return (
+    <section className="dashboard-card px-6 py-14 text-center sm:py-20">
+      <div className="mx-auto grid size-12 place-items-center rounded-2xl bg-stone-100 text-stone-500">
+        <SearchIcon />
+      </div>
+      <h2 className="mt-4 text-lg font-semibold tracking-tight">
+        {hasTransactions ? "Nenhuma movimentação encontrada" : "Nenhuma movimentação registrada"}
+      </h2>
+      <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-stone-500">
+        {hasTransactions
+          ? "Ajuste ou limpe os filtros para ampliar a busca."
+          : "Registre uma nova movimentação pelo Shortcut para começar a acompanhar as finanças."}
+      </p>
+      {hasTransactions && (
+        <button
+          type="button"
+          className="pressable mt-5 rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-sm font-semibold text-ink shadow-sm"
+          onClick={onReset}
+        >
+          Limpar filtros
+        </button>
+      )}
+    </section>
+  );
+}
+
+function ErrorState({ error, onRetry }: { error: string; onRetry: () => void }) {
+  return (
+    <section role="alert" className="dashboard-card dashboard-error border-red-200 bg-red-50/90 p-6 text-red-950">
+      <h2 className="font-semibold">Não foi possível carregar o dashboard</h2>
+      <p className="mt-1 text-sm leading-6 text-red-800">{error}</p>
+      <button
+        type="button"
+        className="pressable mt-4 rounded-xl bg-red-800 px-4 py-2.5 text-sm font-semibold text-white shadow-sm"
+        onClick={onRetry}
+      >
+        Tentar novamente
+      </button>
+    </section>
+  );
+}
+
+function getPeriodLabel(filters: FilterValues): string {
+  const today = new Date();
+
+  if (filters.period === "thisMonth") return formatMonthYear(today);
+  if (filters.period === "lastMonth") return formatMonthYear(new Date(today.getFullYear(), today.getMonth() - 1, 1));
+  if (filters.period === "thisYear") return `ano de ${today.getFullYear()}`;
+
+  if (filters.startDate && filters.endDate) {
+    return `${formatDate(filters.startDate)} — ${formatDate(filters.endDate)}`;
+  }
+  if (filters.startDate) return `a partir de ${formatDate(filters.startDate)}`;
+  if (filters.endDate) return `até ${formatDate(filters.endDate)}`;
+  return "período personalizado";
+}
+
+function SearchIcon() {
+  return (
+    <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+      <circle cx="11" cy="11" r="7" />
+      <path d="m20 20-4-4" />
+    </svg>
+  );
+}
