@@ -259,7 +259,7 @@ export default function ProgressMetricCard({
           </div>
         )}
 
-        <div className={`mt-6 max-w-full whitespace-nowrap sm:max-w-[70%] ${cardSize.headline} font-medium leading-none tracking-[-0.045em] text-ink dark:text-stone-100`}>
+        <div className={`mt-6 min-w-0 max-w-full break-words sm:max-w-[70%] ${cardSize.headline} font-medium leading-none tracking-[-0.045em] text-ink dark:text-stone-100`}>
           {displayTotal}
         </div>
       </div>
