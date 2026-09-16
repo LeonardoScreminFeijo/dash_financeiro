@@ -7,12 +7,10 @@ import { TransactionsTable } from "@/components/dashboard/TransactionsTable";
 import { Filters, type FilterValues } from "@/components/filters/Filters";
 import { getAverageDailyExpense, getBalance, getDailyExpenses, getGroupedExpenses, getIncomeCommittedPercentage, getInstallments, getLargestExpenseCategory, getTotalExpenses, getTotalIncome } from "@/lib/finance";
 import { filterTransactions } from "@/lib/transactions";
-import type { Transaction } from "@/types/transaction";
+import { isTransactionsApiResponse, type Transaction } from "@/types/transaction";
 import { useEffect, useMemo, useState } from "react";
 
 const initialFilters: FilterValues = { period: "thisMonth", type: "all", category: "all", account: "all", query: "", startDate: "", endDate: "" };
-interface ApiResponse { ok: boolean; transactions?: Transaction[]; error?: string }
-
 export function Dashboard() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filters, setFilters] = useState<FilterValues>(initialFilters);
@@ -23,8 +21,8 @@ export function Dashboard() {
     const controller = new AbortController();
     fetch("/api/transactions", { signal: controller.signal })
       .then(async (response) => {
-        const data: ApiResponse = await response.json() as ApiResponse;
-        if (!response.ok || !data.ok || !Array.isArray(data.transactions)) throw new Error(data.error || "Não foi possível carregar os dados.");
+        const data: unknown = await response.json();
+        if (!isTransactionsApiResponse(data) || !response.ok || !data.ok || !Array.isArray(data.transactions)) throw new Error(isTransactionsApiResponse(data) ? data.error || "Não foi possível carregar os dados." : "Não foi possível carregar os dados.");
         setTransactions(data.transactions);
         setStatus("ready");
       })
