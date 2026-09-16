@@ -6,6 +6,6 @@ node_modules/
 credentials.json
 service-account.json
 *.tsbuildinfo
-
+.codex
 *.md
 .codex
