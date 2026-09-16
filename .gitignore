@@ -8,3 +8,4 @@ service-account.json
 *.tsbuildinfo
 
 *.md
+.codex
