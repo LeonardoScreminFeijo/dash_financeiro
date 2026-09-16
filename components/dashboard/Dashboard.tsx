@@ -35,7 +35,7 @@ const initialFilters: FilterValues = {
   endDate: "",
 };
 
-export function Dashboard() {
+export function Dashboard({ userEmail }: { userEmail: string }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filters, setFilters] = useState<FilterValues>(initialFilters);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
@@ -107,6 +107,7 @@ export function Dashboard() {
     <DashboardWithCollapsibleSidebar
       periodLabel={periodLabel}
       transactionCount={dashboardData?.filtered.length}
+      userEmail={userEmail}
     >
       <div className="space-y-6">
         {status === "loading" && <LoadingState />}

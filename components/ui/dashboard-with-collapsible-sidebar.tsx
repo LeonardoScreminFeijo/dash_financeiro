@@ -1,11 +1,13 @@
 "use client";
 
+import { signOutAction } from "@/app/actions/auth";
 import type { LucideIcon } from "lucide-react";
 import {
   ArrowLeftRight,
   BarChart3,
   CreditCard,
   LayoutDashboard,
+  LogOut,
   Menu,
   Moon,
   SlidersHorizontal,
@@ -19,6 +21,7 @@ interface DashboardWithCollapsibleSidebarProps {
   children: ReactNode;
   periodLabel: string;
   transactionCount?: number;
+  userEmail: string;
 }
 
 interface NavigationItem {
@@ -34,6 +37,7 @@ export function DashboardWithCollapsibleSidebar({
   children,
   periodLabel,
   transactionCount,
+  userEmail,
 }: DashboardWithCollapsibleSidebarProps) {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -116,6 +120,7 @@ export function DashboardWithCollapsibleSidebar({
           items={navigationItems}
           selected={selected}
           onSelect={selectNavigationItem}
+          userEmail={userEmail}
         />
       </aside>
 
@@ -142,6 +147,7 @@ export function DashboardWithCollapsibleSidebar({
               items={navigationItems}
               selected={selected}
               onSelect={selectNavigationItem}
+              userEmail={userEmail}
             />
           </aside>
         </div>
@@ -193,11 +199,13 @@ function SidebarContent({
   items,
   selected,
   onSelect,
+  userEmail,
 }: {
   isOpen: boolean;
   items: NavigationItem[];
   selected: string;
   onSelect: (label: string) => void;
+  userEmail: string;
 }) {
   return (
     <>
@@ -244,6 +252,27 @@ function SidebarContent({
           );
         })}
       </nav>
+
+      <div className="border-t border-stone-100 p-2.5 dark:border-stone-800">
+        <form action={signOutAction}>
+          <button
+            type="submit"
+            className="pressable flex h-11 w-full items-center rounded-xl border border-transparent text-stone-600 hover:bg-stone-100 hover:text-ink dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-100"
+            title={isOpen ? undefined : "Sair"}
+            aria-label={isOpen ? undefined : "Sair"}
+          >
+            <span className="grid w-12 shrink-0 place-items-center">
+              <LogOut className="size-[18px]" aria-hidden="true" />
+            </span>
+            {isOpen && (
+              <span className="min-w-0 text-left">
+                <span className="block text-sm font-semibold">Sair</span>
+                <span className="block max-w-40 truncate text-[11px] text-stone-400">{userEmail}</span>
+              </span>
+            )}
+          </button>
+        </form>
+      </div>
     </>
   );
 }
