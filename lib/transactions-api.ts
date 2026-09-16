@@ -3,6 +3,8 @@ import { normalizeTransactions } from "@/lib/normalize";
 import { isAppsScriptTransactionsResponse } from "@/types/transaction";
 import { NextResponse } from "next/server";
 
+const TRANSACTIONS_REVALIDATE_SECONDS = 30;
+
 export async function getTransactions(email: string | null | undefined): Promise<NextResponse> {
   if (!isAuthorizedEmail(email)) {
     return NextResponse.json({ ok: false, error: "Não autorizado." }, { status: 401 });
@@ -21,7 +23,9 @@ export async function getTransactions(email: string | null | undefined): Promise
   try {
     const endpoint = new URL(url);
     endpoint.searchParams.set("secret", secret);
-    const response = await fetch(endpoint, { cache: "no-store" });
+    const response = await fetch(endpoint, {
+      next: { revalidate: TRANSACTIONS_REVALIDATE_SECONDS },
+    });
     if (!response.ok) {
       return NextResponse.json(
         { ok: false, error: "Não foi possível consultar as movimentações." },
