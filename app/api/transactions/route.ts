@@ -20,7 +20,7 @@ export async function GET(): Promise<NextResponse> {
 
     const data: unknown = await response.json();
     if (!isAppsScriptTransactionsResponse(data) || !data.ok || !Array.isArray(data.transactions)) {
-      return NextResponse.json({ ok: false, error: isAppsScriptTransactionsResponse(data) ? data.error ?? "Resposta inválida do serviço." : "Resposta inválida do serviço." }, { status: 502 });
+      return NextResponse.json({ ok: false, error: "Resposta inválida do serviço." }, { status: 502 });
     }
     return NextResponse.json({ ok: true, transactions: normalizeTransactions(data.transactions) });
   } catch {
