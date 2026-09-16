@@ -107,7 +107,7 @@ export default function ProgressMetricCard({
 }: ProgressMetricCardProps) {
   const gridId = `grid-${useId().replace(/:/g, "")}`;
   const cardSize = SIZES[size];
-  const shell = `dashboard-card relative flex ${cardSize.minHeight} w-full flex-col overflow-hidden rounded-[28px] ${className}`;
+  const shell = `dashboard-card relative flex ${cardSize.minHeight} min-w-0 max-w-full w-full flex-col overflow-hidden rounded-[28px] ${className}`;
   const periods = periodOptions?.length ? periodOptions : DEFAULT_PERIODS;
   const [selectedLabel, setSelectedLabel] = useState(period);
   const [view, setView] = useState<ChartView>(defaultView);

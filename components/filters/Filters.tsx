@@ -28,10 +28,10 @@ export function Filters({ values, categories, accounts, resultCount, onChange, o
     onChange({ ...values, [key]: value });
   };
   const activeFilterCount = getActiveFilterCount(values);
-  const fieldClass = "mt-1.5 h-11 w-full rounded-xl border border-stone-200 bg-stone-50/80 px-3 text-sm text-ink outline-none transition-[border-color,box-shadow,background-color] duration-150 focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10";
+  const fieldClass = "mt-1.5 h-11 min-w-0 max-w-full w-full rounded-xl border border-stone-200 bg-stone-50/80 px-3 text-sm text-ink outline-none transition-[border-color,box-shadow,background-color] duration-150 focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10";
 
   return (
-    <section id="filtros" aria-labelledby="filters-title" className="dashboard-card scroll-mt-24 p-4 sm:p-5">
+    <section id="filtros" aria-labelledby="filters-title" className="dashboard-card min-w-0 max-w-full scroll-mt-24 overflow-hidden p-4 sm:p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <div className="grid size-8 place-items-center rounded-xl bg-stone-100 text-stone-600">
@@ -55,7 +55,7 @@ export function Filters({ values, categories, accounts, resultCount, onChange, o
         </button>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-[1.1fr_1fr_1fr_1fr_1.45fr]">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2 xl:grid-cols-[1.1fr_1fr_1fr_1fr_1.45fr]">
         <FilterLabel label="Período">
           <select
             className={fieldClass}
@@ -96,7 +96,7 @@ export function Filters({ values, categories, accounts, resultCount, onChange, o
         </FilterLabel>
 
         <FilterLabel label="Buscar">
-          <div className="relative">
+          <div className="relative min-w-0">
             <span className="pointer-events-none absolute left-3 top-1/2 mt-0.5 -translate-y-1/2 text-stone-400">
               <SearchIcon />
             </span>
@@ -139,7 +139,7 @@ export function Filters({ values, categories, accounts, resultCount, onChange, o
 
 function FilterLabel({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <label className="block text-xs font-semibold text-stone-600">
+    <label className="block min-w-0 max-w-full text-xs font-semibold text-stone-600">
       {label}
       {children}
     </label>

@@ -109,7 +109,7 @@ export function Dashboard({ userEmail }: { userEmail: string }) {
       transactionCount={dashboardData?.filtered.length}
       userEmail={userEmail}
     >
-      <div className="space-y-6">
+      <div className="min-w-0 max-w-full space-y-6">
         {status === "loading" && <LoadingState />}
         {status === "error" && (
           <ErrorState error={error} onRetry={() => setRequestVersion((version) => version + 1)} />

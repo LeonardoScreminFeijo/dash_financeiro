@@ -101,7 +101,7 @@ export function DashboardWithCollapsibleSidebar({
   };
 
   return (
-    <div className="flex min-h-[100dvh] w-full bg-stone-50 text-ink transition-colors dark:bg-stone-950 dark:text-stone-100">
+    <div className="flex min-h-[100dvh] w-full max-w-full overflow-x-clip bg-stone-50 text-ink transition-colors dark:bg-stone-950 dark:text-stone-100">
       <aside
         className={`sticky top-0 hidden h-[100dvh] shrink-0 border-r border-stone-200 bg-white transition-[width,background-color,border-color] duration-300 dark:border-stone-800 dark:bg-stone-900 lg:flex lg:flex-col ${
           isSidebarExpanded ? "w-64" : "w-[4.5rem]"
@@ -186,8 +186,8 @@ export function DashboardWithCollapsibleSidebar({
           </div>
         </header>
 
-        <main className="dashboard-shell">
-          <div className="mx-auto max-w-[1440px]">{children}</div>
+        <main className="dashboard-shell min-w-0 max-w-full">
+          <div className="mx-auto min-w-0 max-w-[1440px]">{children}</div>
         </main>
       </div>
     </div>
