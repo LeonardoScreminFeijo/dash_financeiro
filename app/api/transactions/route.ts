@@ -1,5 +1,5 @@
 import { normalizeTransactions } from "@/lib/normalize";
-import type { TransactionsResponse } from "@/types/transaction";
+import { isAppsScriptTransactionsResponse } from "@/types/transaction";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -19,15 +19,11 @@ export async function GET(): Promise<NextResponse> {
     if (!response.ok) return NextResponse.json({ ok: false, error: "Não foi possível consultar as movimentações." }, { status: 502 });
 
     const data: unknown = await response.json();
-    if (!isTransactionsResponse(data) || !data.ok || !Array.isArray(data.transactions)) {
-      return NextResponse.json({ ok: false, error: isTransactionsResponse(data) ? data.error ?? "Resposta inválida do serviço." : "Resposta inválida do serviço." }, { status: 502 });
+    if (!isAppsScriptTransactionsResponse(data) || !data.ok || !Array.isArray(data.transactions)) {
+      return NextResponse.json({ ok: false, error: "Resposta inválida do serviço." }, { status: 502 });
     }
     return NextResponse.json({ ok: true, transactions: normalizeTransactions(data.transactions) });
   } catch {
     return NextResponse.json({ ok: false, error: "Erro de rede ao consultar as movimentações." }, { status: 502 });
   }
-}
-
-function isTransactionsResponse(value: unknown): value is TransactionsResponse {
-  return typeof value === "object" && value !== null && "ok" in value;
 }

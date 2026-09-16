@@ -4,7 +4,7 @@ import type { FilterValues } from "@/components/filters/Filters";
 function dateRange(period: FilterValues["period"], today: Date, startDate: string, endDate: string): [string, string] {
   const year = today.getFullYear();
   const month = today.getMonth();
-  const asDate = (date: Date) => date.toISOString().slice(0, 10);
+  const asDate = (value: Date) => `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, "0")}-${String(value.getDate()).padStart(2, "0")}`;
   if (period === "thisMonth") return [asDate(new Date(year, month, 1)), asDate(new Date(year, month + 1, 0))];
   if (period === "lastMonth") return [asDate(new Date(year, month - 1, 1)), asDate(new Date(year, month, 0))];
   if (period === "thisYear") return [`${year}-01-01`, `${year}-12-31`];
