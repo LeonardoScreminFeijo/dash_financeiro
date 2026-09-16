@@ -11,7 +11,7 @@ const config: Config = {
       colors: {
         ink: "#17211d",
         canvas: "#f6f7f2",
-        pine: "#176b4e",
+        primary: "#2563eb",
         coral: "#cc5b43",
       },
     },

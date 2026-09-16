@@ -181,7 +181,7 @@ function SidebarContent({
   return (
     <>
       <div className="sidebar-safe-top flex h-20 items-center border-b border-stone-100 px-3 dark:border-stone-800">
-        <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-pine text-white shadow-[0_8px_20px_rgba(23,107,78,0.2)]">
+        <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary text-white shadow-[0_8px_20px_rgba(37,99,235,0.2)]">
           <WalletCards className="size-5" />
         </div>
         {isOpen && (
@@ -203,7 +203,7 @@ function SidebarContent({
               href={item.href}
               className={`pressable relative flex h-11 items-center rounded-xl border transition-colors ${
                 isSelected
-                  ? "border-pine/15 bg-pine/10 text-pine dark:border-emerald-400/15 dark:bg-emerald-400/10 dark:text-emerald-300"
+                  ? "border-primary/15 bg-primary/10 text-primary dark:border-blue-300/20 dark:bg-blue-400/10 dark:text-blue-200"
                   : "border-transparent text-stone-600 hover:bg-stone-100 hover:text-ink dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-100"
               }`}
               onClick={() => onSelect(item.label)}
@@ -215,7 +215,7 @@ function SidebarContent({
               </span>
               {isOpen && <span className="truncate pr-9 text-sm font-semibold">{item.label}</span>}
               {isOpen && item.badge !== undefined && item.badge > 0 && (
-                <span className="absolute right-3 rounded-full bg-pine px-2 py-0.5 text-[11px] font-bold tabular-nums text-white">
+                <span className="absolute right-3 rounded-full bg-primary px-2 py-0.5 text-[11px] font-bold tabular-nums text-white">
                   {item.badge > 99 ? "99+" : item.badge}
                 </span>
               )}
@@ -231,7 +231,7 @@ function applyTheme(isDark: boolean) {
   document.documentElement.classList.toggle("dark", isDark);
   document.documentElement.style.colorScheme = isDark ? "dark" : "light";
   document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]').forEach((meta) => {
-    meta.content = isDark ? "#0c0a09" : "#ffffff";
+    meta.content = isDark ? "#0c0a09" : "#f4f6f3";
   });
 }
 

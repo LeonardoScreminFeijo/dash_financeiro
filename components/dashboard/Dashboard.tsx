@@ -2,6 +2,7 @@
 
 import { BreakdownChart } from "@/components/dashboard/Charts";
 import { InstallmentsCard } from "@/components/dashboard/InstallmentsCard";
+import { RecentTransactions } from "@/components/dashboard/RecentTransactions";
 import { SummaryCards } from "@/components/dashboard/SummaryCards";
 import { TransactionsTable } from "@/components/dashboard/TransactionsTable";
 import { Filters, type FilterValues } from "@/components/filters/Filters";
@@ -136,7 +137,7 @@ export function Dashboard() {
                   largest={dashboardData.largest}
                 />
 
-                <div id="analises" className="grid scroll-mt-24 gap-5 lg:grid-cols-2">
+                <div id="analises" className="grid scroll-mt-24 gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(20rem,0.85fr)]">
                   <ProgressMetricCard
                     key={periodLabel}
                     title="Gasto acumulado"
@@ -149,7 +150,7 @@ export function Dashboard() {
                         : "Sem receitas"
                     }
                     trend="up"
-                    accent="rose"
+                    accent="red"
                     data={dashboardData.cumulativeDailyExpenses}
                     period={periodLabel}
                     periodOptions={[
@@ -159,8 +160,11 @@ export function Dashboard() {
                     ]}
                     valueFormatter={formatCurrency}
                     dateFormatter={formatDate}
-                    className="lg:col-span-2"
                   />
+                  <RecentTransactions transactions={dashboardData.filtered} />
+                </div>
+
+                <div className="grid gap-5 lg:grid-cols-2">
                   <BreakdownChart title="Gastos por categoria" data={dashboardData.categoryData} />
                   <BreakdownChart title="Gastos por conta" data={dashboardData.accountData} />
                   <BreakdownChart title="Gastos por pagamento" data={dashboardData.paymentData} />

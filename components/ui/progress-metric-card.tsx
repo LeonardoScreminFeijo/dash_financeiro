@@ -148,7 +148,7 @@ export default function ProgressMetricCard({
     trend ??
     (Math.abs(stats.percentage) < NEUTRAL_PERCENTAGE ? "flat" : stats.net >= 0 ? "up" : "down");
   const resolvedAccent: MetricAccent =
-    accent ?? (resolvedTrend === "up" ? "emerald" : resolvedTrend === "down" ? "rose" : "neutral");
+    accent ?? (resolvedTrend === "up" ? "green" : resolvedTrend === "down" ? "red" : "neutral");
   const color = ACCENTS[resolvedAccent];
   const TrendIcon = resolvedTrend === "flat" ? ArrowRight : resolvedTrend === "down" ? ArrowDown : ArrowUp;
   const formatShortValue = valueFormatter ?? formatCompact;
