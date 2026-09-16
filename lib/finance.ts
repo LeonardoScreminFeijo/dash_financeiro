@@ -33,6 +33,14 @@ export function getDailyExpenses(transactions: Transaction[]): DailyExpense[] {
   return [...totals].map(([date, value]) => ({ date, value })).sort((a, b) => a.date.localeCompare(b.date));
 }
 
+export function getCumulativeDailyExpenses(transactions: Transaction[]): DailyExpense[] {
+  let accumulated = 0;
+  return getDailyExpenses(transactions).map((expense) => {
+    accumulated += expense.value;
+    return { date: expense.date, value: accumulated };
+  });
+}
+
 export function getAverageDailyExpense(transactions: Transaction[]): number {
   const daily = getDailyExpenses(transactions);
   return daily.length ? getTotalExpenses(transactions) / daily.length : 0;

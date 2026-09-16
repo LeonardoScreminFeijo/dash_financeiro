@@ -4,6 +4,7 @@ import test from "node:test";
 const {
   getAverageDailyExpense,
   getBalance,
+  getCumulativeDailyExpenses,
   getDailyExpenses,
   getGroupedExpenses,
   getIncomeCommittedPercentage,
@@ -53,6 +54,11 @@ test("calcula evolução e média diária de despesas pelos dias com gastos", ()
     { date: "2026-09-03", value: 40 },
   ]);
   assert.equal(getAverageDailyExpense(transactions), 215 / 3);
+  assert.deepEqual(getCumulativeDailyExpenses(transactions), [
+    { date: "2026-09-01", value: 150 },
+    { date: "2026-09-02", value: 175 },
+    { date: "2026-09-03", value: 215 },
+  ]);
 });
 
 test("identifica a maior categoria e somente compras parceladas acima de uma parcela", () => {

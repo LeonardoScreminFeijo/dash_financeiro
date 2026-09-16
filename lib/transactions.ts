@@ -14,10 +14,16 @@ function dateRange(period: FilterValues["period"], today: Date, startDate: strin
 export function filterTransactions(transactions: Transaction[], filters: FilterValues, today = new Date()): Transaction[] {
   const [start, end] = dateRange(filters.period, today, filters.startDate, filters.endDate);
   const query = filters.query.trim().toLocaleLowerCase("pt-BR");
-  return transactions.filter((item) => {
+  const filtered = transactions.filter((item) => {
     const searchable = `${item.description} ${item.category} ${item.originalText}`.toLocaleLowerCase("pt-BR");
     return item.date >= start && item.date <= end && (filters.type === "all" || item.type === filters.type) &&
       (filters.category === "all" || item.category === filters.category) && (filters.account === "all" || item.account === filters.account) &&
       (!query || searchable.includes(query));
-  }).sort((a, b) => `${b.date}T${b.time}`.localeCompare(`${a.date}T${a.time}`));
+  });
+
+  return sortTransactionsByMostRecent(filtered);
+}
+
+export function sortTransactionsByMostRecent(transactions: Transaction[]): Transaction[] {
+  return [...transactions].sort((a, b) => `${b.date}T${b.time}`.localeCompare(`${a.date}T${a.time}`));
 }
