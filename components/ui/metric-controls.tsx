@@ -23,7 +23,7 @@ export function PeriodSelect({
     <label className="relative pointer-events-auto">
       <span className="sr-only">Período do gráfico</span>
       <select
-        className="h-9 appearance-none rounded-xl border border-stone-200 bg-white/90 py-1 pl-3 pr-8 text-xs font-semibold text-stone-700 outline-none transition focus:border-pine focus:ring-4 focus:ring-pine/10 dark:border-stone-700 dark:bg-stone-900/90 dark:text-stone-200"
+        className="h-9 appearance-none rounded-xl border border-stone-200 bg-white/90 py-1 pl-3 pr-8 text-xs font-semibold text-stone-700 outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10 dark:border-stone-700 dark:bg-stone-900/90 dark:text-stone-200"
         value={value}
         onChange={(event) => {
           const option = options.find((item) => item.label === event.target.value);

@@ -28,7 +28,7 @@ export function Filters({ values, categories, accounts, resultCount, onChange, o
     onChange({ ...values, [key]: value });
   };
   const activeFilterCount = getActiveFilterCount(values);
-  const fieldClass = "mt-1.5 h-11 w-full rounded-xl border border-stone-200 bg-stone-50/80 px-3 text-sm text-ink outline-none transition-[border-color,box-shadow,background-color] duration-150 focus:border-pine focus:bg-white focus:ring-4 focus:ring-pine/10";
+  const fieldClass = "mt-1.5 h-11 w-full rounded-xl border border-stone-200 bg-stone-50/80 px-3 text-sm text-ink outline-none transition-[border-color,box-shadow,background-color] duration-150 focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10";
 
   return (
     <section id="filtros" aria-labelledby="filters-title" className="dashboard-card scroll-mt-24 p-4 sm:p-5">

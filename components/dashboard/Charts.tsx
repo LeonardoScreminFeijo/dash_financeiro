@@ -5,7 +5,7 @@ import type { DailyExpense, ValueByLabel } from "@/lib/finance";
 import { Bar, BarChart, CartesianGrid, Cell, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import type { ValueType } from "recharts/types/component/DefaultTooltipContent";
 
-const COLORS = ["#176b4e", "#43866d", "#77a590", "#e6a243", "#cc6a52", "#7767a8"];
+const COLORS = ["#2563eb", "#e6a243", "#cc6a52", "#7767a8", "#0ea5e9", "#a855f7"];
 const MAX_BREAKDOWN_ITEMS = 6;
 const tooltipProps = {
   formatter: (value: ValueType) => formatCurrency(Number(Array.isArray(value) ? value[0] : value)),
@@ -61,10 +61,10 @@ export function DailyExpenseChart({ data }: { data: DailyExpense[] }) {
                 type="monotone"
                 dataKey="value"
                 name="Gastos"
-                stroke="#176b4e"
+                stroke="#dc2626"
                 strokeWidth={2.5}
-                dot={data.length === 1 ? { r: 5, fill: "#176b4e", stroke: "#ffffff", strokeWidth: 3 } : false}
-                activeDot={{ r: 5, fill: "#176b4e", stroke: "#ffffff", strokeWidth: 3 }}
+                dot={data.length === 1 ? { r: 5, fill: "#dc2626", stroke: "#ffffff", strokeWidth: 3 } : false}
+                activeDot={{ r: 5, fill: "#dc2626", stroke: "#ffffff", strokeWidth: 3 }}
                 isAnimationActive={false}
               />
             </LineChart>

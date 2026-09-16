@@ -26,7 +26,7 @@ html {
 body {
   margin: 0;
   background:
-    radial-gradient(circle at 8% -8%, rgba(23, 107, 78, 0.1), transparent 28rem),
+    radial-gradient(circle at 8% -8%, rgba(37, 99, 235, 0.1), transparent 28rem),
     radial-gradient(circle at 94% 4%, rgba(230, 162, 67, 0.09), transparent 24rem),
     #f4f6f3;
   color: #17211d;
@@ -68,7 +68,7 @@ button,
 }
 
 ::selection {
-  background: rgba(23, 107, 78, 0.18);
+  background: rgba(37, 99, 235, 0.2);
 }
 
 .dashboard-shell {

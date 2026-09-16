@@ -14,7 +14,7 @@ import {
 import type { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent";
 
 export type ChartView = "curve" | "bars";
-export type MetricAccent = "emerald" | "rose" | "amber" | "blue" | "neutral";
+export type MetricAccent = "green" | "red" | "amber" | "blue" | "neutral";
 
 export interface SeriesPoint {
   value: number;
@@ -34,14 +34,14 @@ export interface ChartSeries {
 }
 
 export const ACCENTS: Record<MetricAccent, { stroke: string; text: string }> = {
-  emerald: { stroke: "#059669", text: "#047857" },
-  rose: { stroke: "#e11d48", text: "#e11d48" },
+  green: { stroke: "#15803d", text: "#15803d" },
+  red: { stroke: "#dc2626", text: "#dc2626" },
   amber: { stroke: "#d97706", text: "#b45309" },
   blue: { stroke: "#2563eb", text: "#1d4ed8" },
   neutral: { stroke: "#78716c", text: "#57534e" },
 };
 
-export const SERIES_COLORS = ["#176b4e", "#2563eb", "#d97706", "#7c3aed", "#e11d48"];
+export const SERIES_COLORS = ["#2563eb", "#e6a243", "#cc6a52", "#7767a8", "#3b82f6"];
 
 export function formatCompact(value: number): string {
   return new Intl.NumberFormat("pt-BR", { notation: "compact", maximumFractionDigits: 1 }).format(value);

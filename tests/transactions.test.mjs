@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-const { filterTransactions } = await import("../lib/transactions.ts");
+const { filterTransactions, sortTransactionsByMostRecent } = await import("../lib/transactions.ts");
 
 const transactions = [
   { date: "2026-09-16", time: "18:00", type: "expense", category: "Mercado", description: "Compras", amount: 100, account: "Conta A", paymentMethod: "Cartão", installment: "", originalText: "supermercado semanal" },
@@ -47,4 +47,12 @@ test("busca por descrição, categoria e texto original", () => {
   assert.deepEqual(filterTransactions(transactions, { ...defaults, query: "PAGAMENTO" }, today).map((item) => item.description), ["Pagamento"]);
   assert.deepEqual(filterTransactions(transactions, { ...defaults, query: "mercado" }, today).map((item) => item.description), ["Compras"]);
   assert.deepEqual(filterTransactions(transactions, { ...defaults, query: "SEMANAL" }, today).map((item) => item.description), ["Compras"]);
+});
+
+test("ordena os últimos lançamentos sem mutar a lista recebida", () => {
+  const unordered = [transactions[1], transactions[0], transactions[2]];
+  const sorted = sortTransactionsByMostRecent(unordered);
+
+  assert.deepEqual(sorted.map((item) => item.description), ["Compras", "Pagamento", "Cinema"]);
+  assert.deepEqual(unordered.map((item) => item.description), ["Pagamento", "Compras", "Cinema"]);
 });
