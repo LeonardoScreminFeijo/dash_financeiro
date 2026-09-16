@@ -109,8 +109,9 @@ test("contrato da rota de movimentações", async (suite) => {
     const { response, payload } = await callRoute({
       url: "https://apps-script.example/exec?source=dashboard",
       secret,
-      fetchImpl: async (input) => {
+      fetchImpl: async (input, init) => {
         requestedEndpoint = String(input);
+        assert.deepEqual(init, { next: { revalidate: 30 } });
         return Response.json({ ok: true, transactions: [rawTransaction] });
       },
     });
