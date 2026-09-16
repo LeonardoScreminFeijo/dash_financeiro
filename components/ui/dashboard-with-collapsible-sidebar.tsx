@@ -13,7 +13,7 @@ import {
   WalletCards,
   X,
 } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 interface DashboardWithCollapsibleSidebarProps {
   children: ReactNode;
@@ -39,6 +39,7 @@ export function DashboardWithCollapsibleSidebar({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [selected, setSelected] = useState("Visão geral");
+  const mobileMenuTriggerRef = useRef<HTMLButtonElement>(null);
 
   const navigationItems: NavigationItem[] = [
     { href: "#visao-geral", icon: LayoutDashboard, label: "Visão geral" },
@@ -63,6 +64,19 @@ export function DashboardWithCollapsibleSidebar({
     applyTheme(shouldUseDarkTheme);
   }, []);
 
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setIsMobileMenuOpen(false);
+      window.requestAnimationFrame(() => mobileMenuTriggerRef.current?.focus());
+    };
+
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [isMobileMenuOpen]);
+
   const toggleTheme = () => {
     setIsDark((currentTheme) => {
       const nextTheme = !currentTheme;
@@ -75,6 +89,11 @@ export function DashboardWithCollapsibleSidebar({
   const selectNavigationItem = (label: string) => {
     setSelected(label);
     setIsMobileMenuOpen(false);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+    window.requestAnimationFrame(() => mobileMenuTriggerRef.current?.focus());
   };
 
   return (
@@ -105,15 +124,16 @@ export function DashboardWithCollapsibleSidebar({
           <button
             type="button"
             className="absolute inset-0 bg-stone-950/45 backdrop-blur-[2px]"
-            onClick={() => setIsMobileMenuOpen(false)}
+            onClick={closeMobileMenu}
             aria-label="Fechar menu"
           />
-          <aside className="mobile-drawer relative flex h-[100dvh] w-[min(19rem,86vw)] flex-col border-r border-stone-200 bg-white shadow-2xl dark:border-stone-800 dark:bg-stone-900">
+          <aside role="dialog" aria-modal="true" aria-label="Menu de navegação" className="mobile-drawer relative flex h-[100dvh] w-[min(19rem,86vw)] flex-col border-r border-stone-200 bg-white shadow-2xl dark:border-stone-800 dark:bg-stone-900">
             <button
               type="button"
               className="pressable absolute right-3 top-[max(0.75rem,env(safe-area-inset-top,0px))] z-10 grid size-10 place-items-center rounded-xl text-stone-500 hover:bg-stone-100 dark:text-stone-400 dark:hover:bg-stone-800"
-              onClick={() => setIsMobileMenuOpen(false)}
+              onClick={closeMobileMenu}
               aria-label="Fechar menu"
+              autoFocus
             >
               <X className="size-5" />
             </button>
@@ -133,6 +153,7 @@ export function DashboardWithCollapsibleSidebar({
             <div className="flex min-w-0 items-center gap-3">
               <button
                 type="button"
+                ref={mobileMenuTriggerRef}
                 className="pressable grid size-10 shrink-0 place-items-center rounded-xl border border-stone-200 bg-white text-stone-600 shadow-sm hover:bg-stone-50 dark:border-stone-800 dark:bg-stone-900 dark:text-stone-300 dark:hover:bg-stone-800 lg:hidden"
                 onClick={() => setIsMobileMenuOpen(true)}
                 aria-expanded={isMobileMenuOpen}
