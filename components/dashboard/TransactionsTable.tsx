@@ -6,7 +6,7 @@ export function TransactionsTable({ transactions }: { transactions: Transaction[
   const sortedTransactions = sortTransactionsByMostRecent(transactions);
 
   return (
-    <section id="movimentacoes" className="dashboard-card scroll-mt-24 overflow-hidden">
+    <section id="movimentacoes" className="dashboard-card w-full min-w-0 max-w-full scroll-mt-24 overflow-hidden">
       <div className="flex flex-col gap-2 p-4 sm:flex-row sm:items-end sm:justify-between sm:p-5">
         <div>
           <h2 className="text-base font-semibold tracking-tight text-ink">Movimentações</h2>
@@ -18,12 +18,65 @@ export function TransactionsTable({ transactions }: { transactions: Transaction[
       </div>
 
       <div
-        className="scrollbar-subtle overflow-x-auto border-t border-stone-100"
-        tabIndex={0}
+        className="w-full min-w-0 max-w-full border-t border-stone-100"
         role="region"
-        aria-label="Tabela de movimentações com rolagem horizontal"
+        aria-label="Movimentações"
+        aria-describedby="transactions-description"
       >
-        <table className="min-w-[960px] w-full text-left text-sm" aria-describedby="transactions-description">
+        <ul className="divide-y divide-stone-100 sm:hidden">
+          {sortedTransactions.map((item, index) => {
+            const isIncome = item.type === "income";
+
+            return (
+              <li key={`${item.date}-${item.time}-${item.description}-${index}`} className="p-4">
+                <div className="flex items-baseline justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="break-words font-semibold text-ink">{item.description}</p>
+                    <span className={`mt-2 inline-flex items-center gap-1.5 text-xs font-medium ${isIncome ? "text-emerald-700" : "text-red-700"}`}>
+                      <span className={`size-1.5 rounded-full ${isIncome ? "bg-emerald-600" : "bg-red-500"}`} aria-hidden="true" />
+                      {isIncome ? "Receita" : "Despesa"}
+                    </span>
+                  </div>
+                  <p className={`shrink-0 text-right text-sm font-bold tabular-nums ${isIncome ? "text-emerald-700" : "text-red-700"}`}>
+                    <span className="sr-only">{isIncome ? "Receita de" : "Despesa de"}</span>
+                    {isIncome ? "+" : "−"} {formatCurrency(item.amount)}
+                  </p>
+                </div>
+
+                <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1.5">
+                  {item.installment && <span className="rounded-md bg-stone-100 px-1.5 py-0.5 text-xs font-semibold text-stone-600">{item.installment}</span>}
+                </div>
+
+                <dl className="mt-3 grid gap-2 text-xs">
+                  <div className="flex items-start justify-between gap-4">
+                    <dt className="font-medium text-stone-500">{formatDate(item.date)}</dt>
+                    {item.time && <dd className="shrink-0 tabular-nums text-right text-stone-700">{item.time}</dd>}
+                  </div>
+                  <div className="flex items-start justify-between gap-4">
+                    <dt className="shrink-0 font-medium text-stone-500">Categoria</dt>
+                    <dd className="break-words text-right text-stone-700">{item.category}</dd>
+                  </div>
+                  <div className="flex items-start justify-between gap-4">
+                    <dt className="shrink-0 font-medium text-stone-500">Conta</dt>
+                    <dd className="break-words text-right text-stone-700">{item.account}</dd>
+                  </div>
+                  <div className="flex items-start justify-between gap-4">
+                    <dt className="shrink-0 font-medium text-stone-500">Pagamento</dt>
+                    <dd className="break-words text-right text-stone-700">{item.paymentMethod}</dd>
+                  </div>
+                </dl>
+              </li>
+            );
+          })}
+        </ul>
+
+        <div
+          className="scrollbar-subtle hidden w-full min-w-0 max-w-full overflow-x-auto sm:block"
+          tabIndex={0}
+          role="region"
+          aria-label="Tabela de movimentações com rolagem horizontal"
+        >
+          <table className="min-w-[960px] w-full text-left text-sm">
           <thead className="bg-stone-50/90 text-[11px] font-semibold uppercase tracking-[0.08em] text-stone-500">
             <tr>
               <th scope="col" className="px-5 py-3.5">Data</th>
@@ -69,7 +122,8 @@ export function TransactionsTable({ transactions }: { transactions: Transaction[
               );
             })}
           </tbody>
-        </table>
+          </table>
+        </div>
       </div>
     </section>
   );
