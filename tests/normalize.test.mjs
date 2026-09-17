@@ -41,6 +41,11 @@ test("aplica fallbacks aos campos opcionais vazios", () => {
   assert.equal(transaction.originalText, "");
 });
 
+test("reconhece variações do cabeçalho de parcelamento", () => {
+  assert.equal(mapTransaction({ Data: "2026-09-16", Valor: 25, Parcelas: "1/12" }).installment, "1/12");
+  assert.equal(mapTransaction({ Data: "2026-09-16", Valor: 25, "Quantidade de parcelas": "3x" }).installment, "3x");
+});
+
 test("normaliza valores numéricos e negativos para magnitude positiva", () => {
   assert.equal(mapTransaction({ Data: "2026-09-16", Valor: -1234.56 }).amount, 1234.56);
 });

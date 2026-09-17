@@ -68,7 +68,19 @@ export function mapTransaction(row: RawTransaction): Transaction {
     amount: getNumber(field(row, ["Valor", "valor", "amount"])),
     account: getString(field(row, ["Conta", "conta", "account"])) || "Não informada",
     paymentMethod: getString(field(row, ["Pagamento", "pagamento", "Forma de Pagamento", "paymentMethod", "payment_method"])) || "Não informado",
-    installment: getString(field(row, ["Parcelamento", "parcelamento", "installment"])),
+    installment: getString(field(row, [
+      "Parcelamento",
+      "parcelamento",
+      "Parcela",
+      "parcela",
+      "Parcelas",
+      "parcelas",
+      "Quantidade de parcelas",
+      "quantidade de parcelas",
+      "Número de parcelas",
+      "numero de parcelas",
+      "installment",
+    ])),
     originalText: getString(field(row, ["Texto Original", "texto original", "textoOriginal", "originalText", "original_text"])),
   };
 }

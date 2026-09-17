@@ -63,5 +63,26 @@ test("calcula evolução e média diária de despesas pelos dias com gastos", ()
 
 test("identifica a maior categoria e somente compras parceladas acima de uma parcela", () => {
   assert.deepEqual(getLargestExpenseCategory(transactions), { label: "Mercado", value: 125 });
-  assert.deepEqual(getInstallments(transactions).map((item) => item.description), ["Eletrodoméstico", "Viagem"]);
+  const firstOfTwelveInstallments = {
+    date: "2026-09-04",
+    time: "10:00",
+    type: "expense",
+    category: "Tecnologia",
+    description: "Celular",
+    amount: 100,
+    account: "Conta A",
+    paymentMethod: "Cartão",
+    installment: "1/12",
+    originalText: "",
+  };
+  const numericInstallments = {
+    ...firstOfTwelveInstallments,
+    description: "Máquina de lavar",
+    installment: "6",
+  };
+
+  assert.deepEqual(
+    getInstallments([...transactions, firstOfTwelveInstallments, numericInstallments]).map((item) => item.description),
+    ["Eletrodoméstico", "Viagem", "Celular", "Máquina de lavar"],
+  );
 });
