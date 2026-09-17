@@ -49,5 +49,17 @@ export function getAverageDailyExpense(transactions: Transaction[]): number {
 export function getLargestExpenseCategory(transactions: Transaction[]): ValueByLabel | undefined { return getGroupedExpenses(transactions, "category")[0]; }
 
 export function getInstallments(transactions: Transaction[]): Transaction[] {
-  return transactions.filter((item) => item.type === "expense" && /^(?:[2-9]|[1-9]\d+)\s*(?:x|\/)/i.test(item.installment));
+  return transactions.filter((item) => item.type === "expense" && hasMoreThanOneInstallment(item.installment));
+}
+
+function hasMoreThanOneInstallment(installment: string): boolean {
+  const normalizedInstallment = installment.trim();
+  if (/^\d+$/.test(normalizedInstallment)) return Number(normalizedInstallment) > 1;
+
+  const match = normalizedInstallment.match(/^(\d+)\s*(?:x|\/)\s*(\d+)?/i);
+  if (!match) return false;
+
+  const currentInstallment = Number(match[1]);
+  const totalInstallments = match[2] ? Number(match[2]) : currentInstallment;
+  return totalInstallments > 1;
 }

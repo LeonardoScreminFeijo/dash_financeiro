@@ -35,6 +35,8 @@ const initialFilters: FilterValues = {
   endDate: "",
 };
 
+const POLLING_INTERVAL_MS = 30_000;
+
 export function Dashboard({ userEmail }: { userEmail: string }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filters, setFilters] = useState<FilterValues>(initialFilters);
@@ -44,31 +46,49 @@ export function Dashboard({ userEmail }: { userEmail: string }) {
 
   useEffect(() => {
     const controller = new AbortController();
-    setStatus("loading");
-    setError("");
+    let isRequestPending = false;
 
-    fetch("/api/transactions", { signal: controller.signal })
-      .then(async (response) => {
+    const loadTransactions = async (showLoadingState: boolean) => {
+      if (isRequestPending) return;
+      isRequestPending = true;
+
+      if (showLoadingState) {
+        setStatus("loading");
+        setError("");
+      }
+
+      try {
+        const response = await fetch("/api/transactions", { signal: controller.signal });
         const data: unknown = await response.json();
         if (!isTransactionsApiResponse(data) || !response.ok || !data.ok || !Array.isArray(data.transactions)) {
           throw new Error(
-            isTransactionsApiResponse(data)
-              ? data.error || "Não foi possível carregar os dados."
-              : "Não foi possível carregar os dados.",
+            isTransactionsApiResponse(data) ? data.error || "Não foi possível carregar os dados." : "Não foi possível carregar os dados.",
           );
         }
 
         setTransactions(data.transactions);
         setStatus("ready");
-      })
-      .catch((reason: unknown) => {
+      } catch (reason: unknown) {
         if (!(reason instanceof DOMException && reason.name === "AbortError")) {
-          setError(reason instanceof Error ? reason.message : "Erro inesperado.");
-          setStatus("error");
+          if (showLoadingState) {
+            setError(reason instanceof Error ? reason.message : "Erro inesperado.");
+            setStatus("error");
+          }
         }
-      });
+      } finally {
+        isRequestPending = false;
+      }
+    };
 
-    return () => controller.abort();
+    void loadTransactions(true);
+    const pollingId = window.setInterval(() => {
+      if (document.visibilityState === "visible") void loadTransactions(false);
+    }, POLLING_INTERVAL_MS);
+
+    return () => {
+      window.clearInterval(pollingId);
+      controller.abort();
+    };
   }, [requestVersion]);
 
   const categories = useMemo(
