@@ -6,6 +6,16 @@ node_modules/
 credentials.json
 service-account.json
 *.tsbuildinfo
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.tmp
+*.temp
+tmp/
 .codex
 *.md
 .codex

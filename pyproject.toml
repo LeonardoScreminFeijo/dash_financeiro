@@ -1,0 +1,47 @@
+[project]
+name = "dashboard-financeiro-python-backend"
+version = "0.1.0"
+description = "Camada de domínio e automações financeiras do Dashboard Financeiro."
+readme = "README.md"
+requires-python = ">=3.14,<3.15"
+dependencies = [
+    "google-api-python-client==2.200.0",
+    "google-auth==2.58.0",
+    "pydantic==2.13.5",
+    "tzdata==2026.4",
+]
+
+[build-system]
+requires = ["setuptools>=80"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["python_backend*"]
+
+[project.optional-dependencies]
+dev = [
+    "mypy==2.3.1",
+    "pytest==9.1.1",
+    "ruff==0.15.17",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests/python_backend"]
+addopts = "-ra"
+
+[tool.ruff]
+target-version = "py314"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.mypy]
+files = ["python_backend"]
+python_version = "3.14"
+strict = true
+warn_unused_configs = true
+
+[[tool.mypy.overrides]]
+module = ["googleapiclient.*", "google.oauth2.*"]
+ignore_missing_imports = true
